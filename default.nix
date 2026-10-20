@@ -8,8 +8,11 @@ let
   mkShell' = pkgs.mkShell.override {
     stdenv = stdenv.override {
       initialPath = [
+        # Always necessary
         pkgs.coreutils
+        # Used by findXMLCatalogs among a few other hooks
         pkgs.findutils
+        # Often necesssary
         pkgs.bashNonInteractive
       ];
     };
