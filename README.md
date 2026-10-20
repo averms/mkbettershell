@@ -1,6 +1,6 @@
 # mkBetterShell
 
-An alternative to `pkgs.mkShell`.
+A wrapper for `pkgs.mkShell` with better defaults.
 
 ## Usage
 
