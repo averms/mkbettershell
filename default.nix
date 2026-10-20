@@ -24,6 +24,8 @@ mkShell' (
   {
     # Good default
     strictDeps = true;
+    # Keep stdenv from adding -rpath $out/lib, which points into the nonexistent ./outputs/out
+    NIX_NO_SELF_RPATH = true;
   }
   // mkShellArgs
   // {
