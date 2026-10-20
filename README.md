@@ -65,3 +65,7 @@ Then, do
 ```shell
 curl -fsSL https://tangled.org/averms.org/mkbettershell/raw/trunk/.envrc.flakerecommended -o .envrc
 ```
+
+## License
+
+Blue Oak Model License 1.0.0
