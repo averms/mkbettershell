@@ -1,4 +1,5 @@
 {
-  # No outputs. Use `import inputs.mkbettershell pkgs`
-  outputs = _: { };
+  outputs = _: {
+    lib.mkBetterShell = import ./default.nix;
+  };
 }
