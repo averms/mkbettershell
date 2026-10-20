@@ -68,4 +68,4 @@ curl -fsSL https://tangled.org/averms.org/mkbettershell/raw/trunk/.envrc.flakere
 
 ## License
 
-Blue Oak Model License 1.0.0
+This software is distributed under the Blue Oak Model License 1.0.0.
