@@ -9,6 +9,7 @@ let
     stdenv = stdenv.override {
       initialPath = [
         pkgs.coreutils
+        pkgs.findutils
         pkgs.bashNonInteractive
       ];
     };
