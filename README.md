@@ -36,20 +36,21 @@ curl -fsSL https://tangled.org/averms.org/mkbettershell/raw/trunk/.envrc.recomme
   outputs =
     { nixpkgs, mkbettershell, ... }:
     let
-      systems = [
+      forAllSystems = nixpkgs.lib.genAttrs [
         "aarch64-darwin"
         "aarch64-linux"
         "x86_64-linux"
       ];
     in
     {
-      devShells = nixpkgs.lib.genAttrs systems (
+      devShells = forAllSystems (
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          mkBetterShell = mkbettershell.lib.mkBetterShell pkgs;
         in
         {
-          default = mkbettershell.lib.mkBetterShell pkgs {
+          default = mkBetterShell {
             packages = [
               pkgs.pnpm
               pkgs.nodejs-slim_26
