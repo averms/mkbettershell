@@ -29,7 +29,7 @@ curl -fsSL https://tangled.org/averms.org/mkbettershell/raw/trunk/.envrc.recomme
 ```nix
 {
   inputs = {
-    nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.zst";
+    nixpkgs.url = "flake:nixpkgs/nixpkgs-unstable";
     mkbettershell.url = "https://tangled.org/averms.org/mkbettershell/archive/trunk.tar.gz";
   };
 
