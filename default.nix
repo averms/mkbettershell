@@ -1,6 +1,25 @@
 pkgs:
 let
   inherit (pkgs) lib;
+  useLdPrime =
+    stdenv:
+    if !stdenv.targetPlatform.isDarwin then
+      throw "ld-prime can only emit Mach-O (Darwin) binaries"
+    else
+      let
+        ldPrime = pkgs.buildPackages.writeShellScript "ld-prime" ''
+          ld=$(unset DEVELOPER_DIR; /usr/bin/xcrun --find ld)
+          exec "$ld" "$@"
+        '';
+      in
+      if stdenv.cc.isClang then
+        pkgs.stdenvAdapters.overrideMkDerivationArgs (args: {
+          env = (args.env or { }) // {
+            NIX_CFLAGS_LINK = toString (args.env.NIX_CFLAGS_LINK or "") + " --ld-path=${ldPrime}";
+          };
+        }) stdenv
+      else
+        stdenv;
 in
 lib.makeOverridable (
   {
@@ -9,10 +28,12 @@ lib.makeOverridable (
   }:
   let
     useFastLinker = fastLinker && stdenv.hasCC;
-    # Use mold on Linux
+    # Use mold on Linux and ld-prime on macOS
     stdenv' =
       if useFastLinker && stdenv.hostPlatform.isLinux then
         pkgs.stdenvAdapters.useMoldLinker stdenv
+      else if useFastLinker && stdenv.hostPlatform.isDarwin then
+        useLdPrime stdenv
       else
         stdenv;
     mkShell' = pkgs.mkShell.override {
@@ -51,10 +72,6 @@ lib.makeOverridable (
         unset NIX_HARDENING_ENABLE
         # Allow -march=native
         unset NIX_ENFORCE_NO_NATIVE
-      ''
-      # Use ld-prime on macOS
-      + lib.optionalString (useFastLinker && stdenv.hostPlatform.isDarwin) ''
-        export CCC_OVERRIDE_OPTIONS="# +--start-no-unused-arguments +--ld-path=$(unset DEVELOPER_DIR; /usr/bin/xcrun --find ld) +--end-no-unused-arguments"
       ''
       + args.shellHook or "";
     }
