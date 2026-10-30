@@ -5,10 +5,18 @@ in
 lib.makeOverridable (
   {
     stdenv ? pkgs.stdenvNoCC,
+    fastLinker ? true,
   }:
   let
+    useFastLinker = fastLinker && stdenv.hasCC;
+    # Use mold on Linux
+    stdenv' =
+      if useFastLinker && stdenv.hostPlatform.isLinux then
+        pkgs.stdenvAdapters.useMoldLinker stdenv
+      else
+        stdenv;
     mkShell' = pkgs.mkShell.override {
-      stdenv = stdenv.override {
+      stdenv = stdenv'.override {
         initialPath = [
           # Always necessary
           pkgs.coreutils
@@ -45,7 +53,7 @@ lib.makeOverridable (
         unset NIX_ENFORCE_NO_NATIVE
       ''
       # Use ld-prime on macOS
-      + lib.optionalString (stdenv.hasCC && stdenv.hostPlatform.isDarwin) ''
+      + lib.optionalString (useFastLinker && stdenv.hostPlatform.isDarwin) ''
         export CCC_OVERRIDE_OPTIONS="# +--start-no-unused-arguments +--ld-path=$(unset DEVELOPER_DIR; /usr/bin/xcrun --find ld) +--end-no-unused-arguments"
       ''
       + args.shellHook or "";
